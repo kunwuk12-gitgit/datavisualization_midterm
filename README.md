@@ -11,8 +11,8 @@ OECD 회원국의 **대졸 임금 프리미엄**(같은 나라·같은 연령대
 | 순서 | 무엇 | 어디 |
 |---|---|---|
 | 1 | 보고서 | `report/22400498_이건욱_데이터시각화_중간고사_보고서.docx` |
-| 2 | Part A 탐색 대시보드 | 온라인 URL 또는 `site/dashboard/index.html` |
-| 3 | Part B 설명 시각화 | 온라인 URL 또는 `site/story/index.html` |
+| 2 | Part A 탐색 대시보드 | https://kunwuk12-gitgit.github.io/datavisualization_midterm/site/dashboard/ (또는 `site/dashboard/index.html`) |
+| 3 | Part B 설명 시각화 | https://kunwuk12-gitgit.github.io/datavisualization_midterm/site/story/ (또는 `site/story/index.html`) |
 
 - HTML 파일은 더블클릭하면 브라우저(Chrome·Safari·Edge)에서 열립니다. 별도 설치는 필요 없지만,
   차트 라이브러리(Vega 6.4.0 / Vega-Lite 6.4.3 / Vega-Embed 7.2.0)를 CDN에서 불러오므로 **인터넷 연결이 필요**합니다.
