@@ -10,7 +10,7 @@ OECD 회원국의 **대졸 임금 프리미엄**(같은 나라·같은 연령대
 
 | 순서 | 무엇 | 어디 |
 |---|---|---|
-| 1 | 보고서 | `report/22400498_이건욱_데이터시각화_중간고사_보고서.docx` |
+| 1 | 보고서 | `22400498_이건욱_데이터시각화_중간고사_보고서.pdf` (워드 파일도 같은 이름으로 있음) |
 | 2 | Part A 탐색 대시보드 | https://kunwuk12-gitgit.github.io/datavisualization_midterm/site/dashboard/ (또는 `site/dashboard/index.html`) |
 | 3 | Part B 설명 시각화 | https://kunwuk12-gitgit.github.io/datavisualization_midterm/site/story/ (또는 `site/story/index.html`) |
 
@@ -28,6 +28,7 @@ OECD 회원국의 **대졸 임금 프리미엄**(같은 나라·같은 연령대
 ## 폴더 구조
 
 ```
+22400498_…_보고서.pdf / .docx   보고서 (PDF와 워드, 내용 동일)
 data/raw/            OECD 원자료(SDMX 질의 결과, 질의 키·접근일 포함), Gapminder 원본 CSV, 교차검증용 자료
 data/processed/      panel.csv(국가×연도 결합 패널), oecd_average.csv, change_2014_2023.csv,
                      robustness_windows.csv, story_facts.json, prep_log.md(전처리 로그)
@@ -36,7 +37,7 @@ templates/           HTML 템플릿
 prepare_data.py      원자료 → 결합·정제 → data/processed/
 validate_collection.py  연도별 수집값과 국가별 수집값 교차 검증 (276개, 불일치 0)
 build_dashboard.py   Part A 생성 (Altair → Vega-Lite → HTML)
-build_story.py       Part B 생성 (+ PNG)
+build_story.py       Part B 생성
 ```
 
 ## 재현
