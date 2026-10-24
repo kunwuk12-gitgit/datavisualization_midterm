@@ -51,7 +51,7 @@ python build_dashboard.py
 python build_story.py
 ```
 
-## 데이터 출처 (접근일 2026-10-23)
+## 데이터 출처 (접근일 2026-10-24)
 
 - OECD Education at a Glance — `DF_LSO_EARN_REL_UPPER`(상대임금, 전일제), `DF_LSO_NEAC_DISTR_EA`(학력 분포),
   `DF_LSO_NEAC_EMP`(학력별 고용률). https://www.oecd.org/en/data.html
