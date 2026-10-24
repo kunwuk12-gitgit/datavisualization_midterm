@@ -1,0 +1,161 @@
+<title>졸업장 값의 오해</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: 진한 머리띠에 결론 → 큰 숫자 3개 → 01 통념 → 02 검증 → 03 한국 → 요점·한계. 대시보드(Part A)와 같은 시각 언어 */
+:root {
+  --bg: #f3f4f2; --surface: #ffffff; --tint: #edf1f3; --tint-2: #f6f7f5;
+  --ink: #141a21; --ink-2: #4b5560; --muted: #7b848c; --line: #dfe3e6;
+  --band: #18232f; --band-ink: #f2f4f5; --band-muted: #a9b4bf; --band-2: #223140;
+  --kor: #2a78d6; --kor-on-band: #7fb6f2; --up: #1baf7a; --down: #eb6834;
+  --font-sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #0f1215; --surface: #171b20; --tint: #1d242b; --tint-2: #161b20; --ink: #eef1f3; --ink-2: #c0c8cf; --muted: #8d969e; --line: #2a323a; --band: #0a0e12; --band-2: #16202a; --band-ink: #eef1f3; --band-muted: #8d99a5; --kor: #6da7ec; --up: #199e70; --down: #d95926; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --bg: #0f1215; --surface: #171b20; --tint: #1d242b; --tint-2: #161b20; --ink: #eef1f3; --ink-2: #c0c8cf; --muted: #8d969e; --line: #2a323a; --band: #0a0e12; --band-2: #16202a; --band-ink: #eef1f3; --band-muted: #8d99a5; --kor: #6da7ec; --up: #199e70; --down: #d95926; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-sans); font-size: 16px; line-height: 1.7; word-break: keep-all; overflow-wrap: break-word; }
+.inner { max-width: 820px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+.band { background: var(--band); color: var(--band-ink); }
+.band .inner { padding-block: 40px 34px; display: grid; gap: 14px; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--band-muted); }
+h1 { margin: 0; font-size: clamp(26px, 4vw, 38px); line-height: 1.3; letter-spacing: -0.015em; font-weight: 700; text-wrap: balance; }
+h1 em { font-style: normal; color: var(--kor-on-band); }
+.lede { margin: 0; color: var(--band-muted); font-size: 16px; max-width: 66ch; }
+.lede b { color: var(--band-ink); }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; margin-top: 8px; }
+.stat { background: var(--band-2); padding: 14px 16px; display: grid; gap: 2px; }
+.stat .n { font-size: 34px; font-weight: 700; line-height: 1.2; font-variant-numeric: tabular-nums; color: var(--band-ink); }
+.stat .n.k { color: var(--kor-on-band); }
+.stat .l { font-size: 13px; color: var(--band-muted); line-height: 1.45; }
+
+main.inner { display: grid; gap: 34px; padding-block: 30px 64px; }
+.who { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; font-size: 14.5px; padding: 14px 18px; background: var(--surface); border: 1px solid var(--line); }
+.who dt { color: var(--muted); font-weight: 600; }
+.who dd { margin: 0; color: var(--ink-2); }
+.key { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted); }
+.key b { color: var(--ink-2); font-weight: 600; }
+.sw { display: inline-flex; padding: 2px 10px; border-radius: 4px; color: #fff; font-weight: 600; }
+.sw.sw-kor { background: var(--kor); } .sw.sw-up { background: var(--up); color: #062a1c; } .sw.sw-down { background: var(--down); } .sw.sw-oth { background: #8a8f94; }
+
+.step { display: grid; gap: 12px; }
+.step-h { display: flex; align-items: center; gap: 12px; }
+.badge { background: var(--band); color: var(--band-ink); font-family: var(--font-mono); font-weight: 600; font-size: 15px; width: 56px; padding: 4px 0; text-align: center; border-radius: 2px; flex: none; }
+.step h2 { margin: 0; font-size: 20px; line-height: 1.4; font-weight: 700; text-wrap: balance; }
+.step p { margin: 0; color: var(--ink-2); max-width: 70ch; }
+.step p b { color: var(--ink); }
+.figure { background: var(--surface); border: 1px solid var(--line); padding: 18px 14px 12px; overflow-x: auto; }
+.vis { min-height: 300px; }
+.reads { font-size: 13.5px; color: var(--muted); font-style: italic; }
+.k { color: var(--kor); font-weight: 700; } .u { color: var(--up); font-weight: 700; } .d { color: var(--down); font-weight: 700; }
+
+.take { display: grid; gap: 2px; background: var(--tint); }
+.take h2 { margin: 0; padding: 12px 18px 4px; font-size: 19px; background: var(--tint-2); }
+.take p { margin: 0; padding: 10px 18px 10px 44px; position: relative; background: var(--tint-2); color: var(--ink-2); }
+.take p::before { content: "▶"; position: absolute; left: 18px; top: 12px; font-size: 11px; color: var(--kor); }
+.take p b { color: var(--ink); }
+.limits h2, .method h2 { font-size: 15px; margin: 0 0 8px; color: var(--muted); font-weight: 600; letter-spacing: .02em; }
+.limits ul { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; font-size: 14.5px; color: var(--ink-2); }
+.method { font-size: 13px; color: var(--muted); display: grid; gap: 6px; font-style: italic; }
+.method p { margin: 0; } .method a { color: var(--ink-2); }
+.mono { font-family: var(--font-mono); font-size: 12px; font-style: normal; }
+.num { font-variant-numeric: tabular-nums; }
+@media (max-width: 640px) { .stats { grid-template-columns: 1fr; } .who { grid-template-columns: 1fr; } .badge { width: 44px; } }
+</style>
+
+<header class="band"><div class="inner">
+  <div class="eyebrow">OECD 회원국 · 25–34세 · 2014–2024</div>
+  <h1>대졸자가 더 많이 늘어난 나라에서 졸업장 값이 더 떨어지지는 않았다. <em>한국 청년의 낮은 대졸 프리미엄</em>은 ‘대졸자가 너무 많아서’만으로는 설명되지 않는다.</h1>
+  <p class="lede">“다들 대학에 가니 졸업장 값이 떨어졌다”는 말은 익숙합니다. 한국은 숫자만 보면 그 말이 딱 맞아 보이는 나라입니다. 하지만 한 해가 아니라 지난 10년의 <b>변화</b>를 보면 결과가 다릅니다.</p>
+  <div class="stats">
+    <div class="stat"><div class="n k">{{kor_att}}%</div><div class="l">한국 25–34세 대졸자 비율<br>OECD {{n_cs}}개국 중 {{rank_att}}위 (2023)</div></div>
+    <div class="stat"><div class="n k">{{kor_prem}}</div><div class="l">한국 청년 대졸 임금 프리미엄 (고졸 = 100)<br>낮은 순 {{rank_prem_low}}위 (2023)</div></div>
+    <div class="stat"><div class="n">r = {{r_ch}}</div><div class="l">대졸자 증가 폭과 프리미엄 변화의 상관<br>OECD {{n_ch}}개국, 2014–15 → 2022–23</div></div>
+  </div>
+</div></header>
+
+<main class="inner">
+  <dl class="who">
+    <dt>대상 독자</dt><dd>대학 진학·전공·취업을 고민하는 한국의 대학생과 청년, 대학 정원과 고등교육 정책을 논의하는 사람</dd>
+    <dt>왜 중요한가</dt><dd>졸업장 값 하락의 원인을 ‘대졸자 과잉’으로만 보면 대학 정원 축소 같은 처방에만 관심이 쏠립니다. 공급 말고 다른 요인을 봐야 한다는 근거를 데이터로 보여줍니다.</dd>
+    <dt>측정 방법</dt><dd><b>대졸 임금 프리미엄</b> = 같은 나라, 같은 연령대의 고졸 전일제 근로자 평균 임금을 100으로 둘 때 대졸 전일제 근로자의 평균 임금 (OECD)</dd>
+  </dl>
+  <div class="key"><b>색 범례</b><span class="sw sw-kor">한국</span><span class="sw sw-up">프리미엄 상승</span><span class="sw sw-down">프리미엄 하락</span><span class="sw sw-oth">OECD 평균 · 다른 나라</span></div>
+
+  <section class="step" aria-labelledby="s1">
+    <div class="step-h"><span class="badge">01</span><h2 id="s1">한 해만 보면 통념이 맞아 보입니다</h2></div>
+    <p>2023년 {{n_cs}}개국을 한 장에 놓으면 대졸자 비율이 높은 나라일수록 프리미엄이 낮은 경향이 있습니다(r = {{r_cs}}). <span class="k">한국</span>은 대졸자 비율 {{rank_att}}위(<span class="num">{{kor_att}}%</span>), 프리미엄 하위 {{rank_prem_low}}위(<span class="num">{{kor_prem}}</span>)로 그 끝에 있습니다. 다만 이 기울기에는 <b>부유한 나라일수록 프리미엄이 낮은 소득 효과</b>(로그 1인당 GDP와 r = {{r_gdp}})가 섞여 있어, 한 해 단면만으로는 대졸자 수의 영향을 가려낼 수 없습니다.</p>
+    <div class="figure"><div class="vis" id="c1"></div></div>
+  </section>
+
+  <section class="step" aria-labelledby="s2">
+    <div class="step-h"><span class="badge">02</span><h2 id="s2">그런데 변화로 보면 관계가 사라집니다</h2></div>
+    <p>통념이 맞다면 대졸자가 많이 늘어난 나라일수록(오른쪽) 프리미엄이 많이 떨어졌어야(아래쪽) 합니다. 실제로는 <span class="u">프리미엄이 오른 나라 {{n_up}}개</span>와 <span class="d">내린 나라 {{n_down}}개</span>가 대졸자 증가 폭과 상관없이 섞여 있습니다(r = {{r_ch}}). 대졸자가 비슷하게 늘어난 캐나다·스페인은 프리미엄이 올랐고 튀르키예·노르웨이는 내렸습니다. {{n_ch}}개국 평균으로 보면 대졸자 비율은 {{m_datt}}%p 늘었지만 프리미엄 변화는 평균 {{m_dprem}}에 그쳤습니다. 비교 연도를 다섯 가지로 바꿔도 r은 {{r_min}} ~ {{r_max}}였습니다.</p>
+    <div class="figure"><div class="vis" id="c2"></div></div>
+    <p class="reads">읽는 법 · 오른쪽으로 갈수록 대졸자가 많이 늘어난 나라, 가로 0선 위(초록)는 프리미엄이 오른 나라, 아래(주황)는 내린 나라입니다. 통념대로라면 오른쪽으로 갈수록 주황 점만 남아야 합니다.</p>
+  </section>
+
+  <section class="step" aria-labelledby="s3">
+    <div class="step-h"><span class="badge">03</span><h2 id="s3">한국에서도 대졸자 비율은 멈췄는데 프리미엄은 계속 내려갔습니다</h2></div>
+    <p><span class="k">한국</span>의 25–34세 대졸자 비율은 2014년 <span class="num">{{a0}}%</span>에서 2024년 <span class="num">{{a1}}%</span>로 거의 그대로였습니다. 같은 기간 프리미엄은 <span class="num">{{pr0}}</span>에서 <span class="num">{{pr1}}</span>으로 꾸준히 낮아졌습니다. 2014년 이전에는 대졸자 비율이 빠르게 늘면서 프리미엄도 함께 내려갔지만, 그 이후의 하락은 대졸자 증가로 설명되지 않습니다.</p>
+    <div class="figure"><div class="vis" id="c3"></div></div>
+    <p class="reads">읽는 법 · 두 패널은 같은 연도 축을 씁니다. 회색 점선은 OECD 평균입니다. 단위가 다른 두 값을 한 축에 겹치지 않고 위아래로 나눴습니다.</p>
+  </section>
+
+  <section class="take" aria-labelledby="sc">
+    <h2 id="sc">그래서? 세 가지 요점</h2>
+    <p><b>단면은 착시를 만든다.</b> 2023년 한 해만 보면 대졸자가 많은 나라의 프리미엄이 낮지만(r = {{r_cs}}), 소득 수준(로그 1인당 GDP)과의 관계(r = {{r_gdp}})가 더 강하다.</p>
+    <p><b>변화는 통념과 다르다.</b> {{n_ch}}개국에서 대졸자 증가 폭과 프리미엄 변화의 상관은 r = {{r_ch}}. 대졸자가 많이 늘어난 나라라고 졸업장 값이 더 떨어지지 않았다.</p>
+    <p><b>한국의 하락은 다른 곳을 봐야 한다.</b> 2014년 이후 대졸자 비율은 +{{a_diff}}%p에 그쳤지만 프리미엄은 {{pr0}} → {{pr1}}. 대졸자가 일하는 일자리의 질, 고졸 임금의 변화 같은 요인을 함께 살펴봐야 한다.</p>
+  </section>
+
+  <section class="limits" aria-labelledby="sl">
+    <h2 id="sl">해석할 때 주의할 점</h2>
+    <ul>
+      <li><b>인과관계가 아닙니다.</b> 상관이 없다는 것은 ‘대졸자 증가가 프리미엄을 낮춘다’는 단순한 관계가 데이터에서 보이지 않는다는 뜻일 뿐, 대졸자 수가 전혀 영향을 주지 않는다는 증명은 아닙니다.</li>
+      <li><b>상대 임금입니다.</b> 고졸 임금이 오르면(예: 최저임금 인상) 대졸 임금이 그대로여도 프리미엄은 낮아집니다. 이 자료로는 두 경로를 구분할 수 없습니다.</li>
+      <li><b>전일제 근로자의 평균입니다.</b> 일하지 않는 사람, 시간제 근로자, 전공·대학별 차이는 반영되지 않습니다.</li>
+      <li><b>범위는 OECD 회원국입니다.</b> 일본·아이슬란드는 임금 자료가 없어 빠졌고, 변화 분석은 두 시점 모두 자료가 있는 {{n_ch}}개국만 포함합니다. 2014년 OECD 학력 분류 변경(ISCED 2011) 이전 값과는 비교하지 않았습니다.</li>
+      <li>OECD 임금 자료는 나라마다 조사 기준 연도가 1년 정도 다를 수 있습니다.</li>
+    </ul>
+  </section>
+
+  <footer class="method" aria-labelledby="sm">
+    <h2 id="sm">데이터와 방법</h2>
+    <p>OECD Education at a Glance: 고등교육 이수자의 상대 임금 <span class="mono">DF_LSO_EARN_REL_UPPER</span>(전일제, 고졸 = 100), 대졸자 비율 <span class="mono">DF_LSO_NEAC_DISTR_EA</span>. Gapminder: 1인당 GDP(PPP, 2021년 불변 국제달러). 접근일 2026-10-24. <a href="https://www.oecd.org/en/data.html" target="_blank" rel="noopener">oecd.org/en/data</a> · <a href="https://www.gapminder.org/data" target="_blank" rel="noopener">gapminder.org/data</a></p>
+    <p>변화량은 시작(2014·2015년)과 끝(2022·2023년) 각각 두 해 평균의 차이입니다. 상관계수는 피어슨 r이며, 회색 실선은 최소제곱 직선입니다. 점 위에 마우스를 올리면 값을 볼 수 있지만, 메시지는 고정된 화면만으로 읽히도록 구성했습니다.</p>
+  </footer>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/vega@6.4.0/build/vega.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-lite@6.4.3/build/vega-lite.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-embed@7.2.0/build/vega-embed.min.js"></script>
+<script>
+(function () {
+  const SPECS = /*__SPECS__*/null;
+  const SWAP = [["#2a78d6", "#6da7ec"], ["#0b0b0b", "#f0efec"], ["#52514e", "#c3c2b7"], ["#c9c8c0", "#4a4945"], ["#dedcd4", "#33332f"],
+                ["#fcfcfb", "#171b20"], ["#e9e8e2", "#262c31"], ["#c3c2b7", "#4a4945"], ["#1baf7a", "#199e70"], ["#eb6834", "#d95926"], ["#8f8e88", "#9a9890"]];
+  function isDark() {
+    const t = document.documentElement.getAttribute("data-theme");
+    if (t === "dark") return true; if (t === "light") return false;
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  }
+  function render() {
+    const dark = isDark();
+    Object.keys(SPECS).forEach(id => {
+      let s = JSON.stringify(SPECS[id]);
+      if (dark) { SWAP.forEach(([a], i) => { s = s.split(a).join("@@" + i + "@@"); }); SWAP.forEach(([, b], i) => { s = s.split("@@" + i + "@@").join(b); }); }
+      vegaEmbed("#" + id, JSON.parse(s), { actions: false, renderer: "svg", tooltip: { theme: dark ? "dark" : "light" } })
+        .catch(() => { document.getElementById(id).textContent = "차트를 불러오지 못했습니다. 인터넷 연결을 확인해 주세요."; });
+    });
+  }
+  if (window.matchMedia) window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render);
+  new MutationObserver(render).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  render();
+})();
+</script>

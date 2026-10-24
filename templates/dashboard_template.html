@@ -1,0 +1,462 @@
+<title>대졸 프리미엄 탐색기</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: 성적표처럼 읽히는 안내형 대시보드 — 진한 머리띠 → 바꿀 수 있는 4칸 → 결론 문장 → 질문 1~5 섹션 */
+:root {
+  --bg: #f3f4f2;  --surface: #ffffff;  --tint: #edf1f3;  --tint-2: #f6f7f5;
+  --ink: #141a21; --ink-2: #4b5560; --muted: #7b848c; --line: #dfe3e6;
+  --band: #18232f; --band-ink: #f2f4f5; --band-muted: #a9b4bf;
+  --sel: #2a78d6; --cmp: #eb6834; --oecd: #52514e;
+  --field: #fbf4dc; --field-line: #e2cf8f;
+  --up-bg: #e2f2ec; --down-bg: #fbe9e3;
+  --font-sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1215; --surface: #171b20; --tint: #1d242b; --tint-2: #161b20; --ink: #eef1f3; --ink-2: #c0c8cf; --muted: #8d969e;
+    --line: #2a323a; --band: #0a0e12; --band-ink: #eef1f3; --band-muted: #8d99a5; --sel: #3987e5; --cmp: #d95926; --oecd: #c3c2b7;
+    --field: #2a2514; --field-line: #6b5a24; --up-bg: #12302a; --down-bg: #3a1e17; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1215; --surface: #171b20; --tint: #1d242b; --tint-2: #161b20; --ink: #eef1f3; --ink-2: #c0c8cf; --muted: #8d969e;
+  --line: #2a323a; --band: #0a0e12; --band-ink: #eef1f3; --band-muted: #8d99a5; --sel: #3987e5; --cmp: #d95926; --oecd: #c3c2b7;
+  --field: #2a2514; --field-line: #6b5a24; --up-bg: #12302a; --down-bg: #3a1e17; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-sans); font-size: 15px; line-height: 1.6; word-break: keep-all; overflow-wrap: break-word; }
+.inner { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* 머리띠 */
+.band { background: var(--band); color: var(--band-ink); }
+.band .inner { padding-block: 22px 20px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; }
+.band h1 { margin: 0; font-size: 22px; letter-spacing: .01em; font-weight: 700; }
+.band h1 span { color: var(--band-muted); font-weight: 500; }
+.band .src { font-family: var(--font-mono); font-size: 12px; color: var(--band-muted); margin-left: auto; }
+
+/* 바꿀 수 있는 4칸 */
+.controls { display: grid; grid-template-columns: 1.15fr 1.15fr 1.5fr 1.2fr auto; border: 1.5px solid var(--ink); border-top: 0; background: var(--surface); }
+.ctl { display: grid; gap: 4px; padding: 8px 14px 10px; border-right: 1px solid var(--line); min-width: 0; }
+.ctl label, .ctl .lbl { font-size: 11.5px; font-weight: 700; letter-spacing: .03em; color: var(--ink-2); }
+.ctl.c1 .lbl { color: var(--sel); } .ctl.c2 .lbl { color: var(--cmp); }
+.ctl select, .ctl .yearbox, .seg { background: var(--field); border: 1px solid var(--field-line); border-radius: 6px; font: inherit; font-size: 16px; font-weight: 700; color: var(--ink); padding: 6px 10px; width: 100%; }
+.ctl.c1 select { color: var(--sel); } .ctl.c2 select { color: var(--cmp); }
+.yearbox { display: flex; align-items: center; gap: 10px; }
+.yearbox input { flex: 1; min-width: 0; accent-color: var(--sel); }
+.yearbox output { font-family: var(--font-mono); font-weight: 600; min-width: 3em; text-align: right; }
+.seg { display: flex; padding: 3px; gap: 3px; }
+.seg button { flex: 1; font: inherit; font-size: 14px; font-weight: 600; border: 0; border-radius: 4px; padding: 4px 6px; background: transparent; color: var(--ink-2); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+#reset { align-self: stretch; border: 0; border-left: 1px solid var(--line); background: var(--tint-2); font: inherit; font-weight: 600; font-size: 13.5px; color: var(--ink); padding: 0 18px; cursor: pointer; }
+#reset:hover { background: var(--tint); }
+button:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px solid var(--sel); outline-offset: 2px; }
+
+main.inner { display: grid; gap: 26px; padding-block: 22px 60px; }
+.lead h2 { margin: 0; font-size: clamp(21px, 2.6vw, 27px); line-height: 1.35; font-weight: 700; text-wrap: balance; }
+.lead h2 .s { color: var(--sel); } .lead h2 .c { color: var(--cmp); }
+.lead .q { margin: 8px 0 0; color: #3f7f86; font-style: italic; font-size: 14.5px; }
+:root[data-theme="dark"] .lead .q { color: #7fbcc2; }
+.key { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px; font-size: 12.5px; color: var(--muted); }
+.key b { color: var(--ink-2); font-weight: 600; margin-right: 2px; }
+.key .sw { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 4px; color: #fff; font-weight: 600; }
+.sw.s { background: var(--sel); } .sw.c { background: var(--cmp); } .sw.o { background: #8a8f94; }
+
+.sec { display: grid; gap: 10px; }
+.sec-h { display: flex; align-items: center; gap: 12px; }
+.badge { background: var(--band); color: var(--band-ink); font-family: var(--font-mono); font-weight: 600; font-size: 15px; width: 64px; padding: 4px 0; text-align: center; border-radius: 2px; }
+.sec-h h3 { margin: 0; font-size: 18px; font-weight: 700; }
+.how { margin: 0; font-size: 12.5px; color: var(--muted); font-style: italic; max-width: 110ch; }
+.flash { animation: flash .7s ease-out; }
+@keyframes flash { from { background: color-mix(in srgb, var(--sel) 16%, transparent); } to { background: transparent; } }
+@media (prefers-reduced-motion: reduce) { .flash { animation: none; } }
+
+/* KPI 카드 */
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3px; }
+.kpi { background: var(--tint); padding: 12px 16px 14px; display: grid; gap: 2px; align-content: start; }
+.kpi .k { font-size: 11.5px; font-weight: 600; color: var(--ink-2); letter-spacing: .02em; }
+.kpi .v { font-size: 34px; font-weight: 700; color: var(--sel); line-height: 1.25; font-variant-numeric: tabular-nums; }
+.kpi .v small { font-size: 15px; font-weight: 600; margin-left: 2px; }
+.kpi .cmpv { color: var(--cmp); font-weight: 600; font-size: 13.5px; }
+.kpi .avg { color: var(--muted); font-size: 13.5px; }
+.kpi .rk { font-weight: 700; font-size: 13.5px; }
+.kpi .chip { justify-self: start; margin-top: 4px; font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); color: var(--ink-2); }
+.na { color: var(--muted); font-weight: 500; }
+
+/* 2열 */
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+.panel { background: var(--surface); border: 1px solid var(--line); padding: 14px 12px 8px; overflow-x: auto; min-width: 0; }
+.shows { background: var(--tint-2); border: 1px solid var(--line); border-top: 0; padding: 10px 14px; font-size: 14px; color: var(--ink-2); }
+.shows b.t { display: block; color: var(--ink); font-size: 13px; margin-bottom: 2px; }
+.shows .s { color: var(--sel); font-weight: 700; } .shows .c { color: var(--cmp); font-weight: 700; }
+.col { display: grid; align-content: start; min-width: 0; }
+
+table.chg { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; background: var(--surface); }
+table.chg th { background: var(--band); color: var(--band-ink); font-weight: 600; font-size: 12.5px; padding: 9px 8px; text-align: center; }
+table.chg td { border: 1px solid var(--line); padding: 8px; text-align: center; }
+table.chg td:first-child { text-align: left; font-weight: 600; background: var(--tint-2); }
+table.chg td.up { background: var(--up-bg); font-weight: 700; } table.chg td.down { background: var(--down-bg); font-weight: 700; }
+table.chg td.vs { font-weight: 600; font-size: 13px; white-space: nowrap; }
+.tbl-wrap { overflow-x: auto; }
+.note { font-size: 12px; color: var(--muted); margin: 6px 0 0; }
+
+/* 요점 */
+.take { background: var(--tint); display: grid; gap: 2px; }
+.take p { margin: 0; padding: 10px 16px 10px 44px; position: relative; background: var(--tint-2); font-size: 14.5px; }
+.take p::before { content: "▶"; position: absolute; left: 18px; top: 11px; font-size: 11px; color: var(--sel); }
+.take b { color: var(--ink); }
+
+details { background: var(--surface); border: 1px solid var(--line); padding: 10px 14px; }
+summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+table.data { border-collapse: collapse; font-size: 13px; width: 100%; font-variant-numeric: tabular-nums; margin-top: 8px; }
+table.data th, table.data td { padding: 4px 9px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+table.data th:first-child, table.data td:first-child { text-align: left; }
+table.data th { color: var(--muted); font-weight: 500; font-size: 12px; }
+table.data tr.s td { color: var(--sel); font-weight: 700; } table.data tr.c td { color: var(--cmp); font-weight: 700; }
+footer { font-size: 12.5px; color: var(--muted); font-style: italic; }
+footer a { color: var(--ink-2); }
+
+@media (max-width: 980px) {
+  .controls { grid-template-columns: 1fr 1fr; }
+  #reset { grid-column: 1 / -1; border-left: 0; border-top: 1px solid var(--line); padding: 10px; }
+  .two { grid-template-columns: 1fr; }
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px) { .kpis { grid-template-columns: 1fr; } .controls { grid-template-columns: 1fr; } .badge { width: 44px; } }
+</style>
+
+<div class="band"><div class="inner">
+  <h1>대학 졸업장의 값 <span>| OECD 36개국 대졸 임금 프리미엄, 2010–2024</span></h1>
+  <div class="src">OECD Education at a Glance · Gapminder</div>
+</div></div>
+
+<div class="inner">
+  <div class="controls" role="group" aria-label="보기 설정">
+    <div class="ctl c1"><label class="lbl" for="sel">① 국가 (선택)</label><select id="sel"></select></div>
+    <div class="ctl c2"><label class="lbl" for="cmp">② 비교 국가 (선택 사항)</label><select id="cmp"></select></div>
+    <div class="ctl"><label class="lbl" for="year">③ 연도</label><div class="yearbox"><input type="range" id="year" min="2010" max="2024" step="1" value="2023"><output id="yearOut" for="year">2023</output></div></div>
+    <div class="ctl"><span class="lbl" id="ageLbl">④ 연령대</span><div class="seg" role="group" aria-labelledby="ageLbl"><button type="button" data-age="25_34" aria-pressed="true">25–34세</button><button type="button" data-age="55_64" aria-pressed="false">55–64세</button></div></div>
+    <button id="reset" type="button">처음 상태로</button>
+  </div>
+</div>
+
+<main class="inner">
+  <section class="lead" aria-live="polite">
+    <h2 id="headline">…</h2>
+    <p class="q">질문: 선택한 나라의 대학 졸업장 값은 OECD 평균과 비교해 어디쯤이고, 2014년 이후 어떻게 변했으며, 대졸자가 많다는 것으로 얼마나 설명되는가?</p>
+    <div class="key"><b>색 범례</b><span class="sw s">선택 국가</span><span class="sw c">비교 국가</span><span class="sw o">OECD 평균 · 다른 나라</span>
+      <span>위 4칸을 바꾸면 아래의 모든 숫자·차트·문장이 함께 바뀝니다. 차트의 점을 클릭하면 ① 국가, <kbd>Shift</kbd>+클릭하면 ② 비교 국가가 됩니다.</span></div>
+  </section>
+
+  <section class="sec" aria-labelledby="h1">
+    <div class="sec-h"><span class="badge">1</span><h3 id="h1">…</h3></div>
+    <p class="how">읽는 법: 큰 숫자는 선택 국가, 그 아래는 비교 국가·OECD 평균, 순위는 해당 연도에 자료가 있는 OECD 회원국 중 위치입니다. 프리미엄 = 같은 나라·같은 연령대 고졸 전일제 근로자 평균 임금을 100으로 둘 때 대졸 전일제 근로자의 평균 임금.</p>
+    <div class="kpis" id="kpis"></div>
+  </section>
+
+  <section class="sec" aria-labelledby="h2">
+    <div class="sec-h"><span class="badge">2</span><h3 id="h2">…</h3></div>
+    <div class="two">
+      <div class="col">
+        <p class="how">읽는 법: 각 선은 2014년 값을 0으로 둔 프리미엄 변화입니다. 0선 위는 2014년보다 졸업장 값이 오른 것, 아래는 내린 것. 굵은 선 = 선택·비교 국가, 회색 점선 = OECD 평균, 연한 선 = 다른 나라.</p>
+        <div class="panel"><div id="v-lines"></div></div>
+        <div class="shows" id="t-lines"></div>
+      </div>
+      <div class="col">
+        <p class="how">읽는 법: 변화 = 선택 연도 − 2014년. 칸 색은 증가(연한 초록)·감소(연한 주황)를 뜻할 뿐 좋고 나쁨이 아닙니다. 마지막 열 = 선택 국가의 변화 − OECD 평균의 변화.</p>
+        <div class="tbl-wrap"><table class="chg" id="chg"></table></div>
+        <p class="note" id="chg-note"></p>
+      </div>
+    </div>
+  </section>
+
+  <div class="two">
+    <section class="sec" aria-labelledby="h3">
+      <div class="sec-h"><span class="badge">3</span><h3 id="h3">대졸자가 많으면 졸업장 값이 낮을까?</h3></div>
+      <p class="how">읽는 법: 점 하나가 한 나라. 오른쪽일수록 대졸자가 많고, 위쪽일수록 프리미엄이 높습니다. 초록 실선은 같은 해 나라들의 평균적인 관계(추세선), 점선은 OECD 평균.</p>
+      <div class="panel"><div id="v-scatter"></div></div>
+      <div class="shows" id="t-scatter"></div>
+    </section>
+    <section class="sec" aria-labelledby="h4">
+      <div class="sec-h"><span class="badge">4</span><h3 id="h4">부모 세대와 비교하면?</h3></div>
+      <p class="how">읽는 법: 한 줄이 한 나라. ● = 25–34세, ○ = 55–64세, 선 길이 = 세대 격차. 선택한 연령대의 프리미엄이 높은 순으로 정렬됩니다.</p>
+      <div class="panel"><div id="v-db"></div></div>
+      <div class="shows" id="t-db"></div>
+    </section>
+  </div>
+
+  <section class="sec" aria-labelledby="h5">
+    <div class="sec-h"><span class="badge">5</span><h3 id="h5">그래서? 세 가지 요점</h3></div>
+    <div class="take" id="take"></div>
+  </section>
+
+  <details id="tv">
+    <summary id="tv-sum">현재 연도의 모든 나라 값을 표로 보기</summary>
+    <div class="tbl-wrap"><table class="data"><thead><tr><th>국가</th><th>프리미엄 25–34세</th><th>프리미엄 55–64세</th><th>대졸자 비율 (선택 연령, %)</th><th>25–34세 대졸 고용률 (%)</th><th>1인당 GDP (천$)</th><th>15–24세 실업률 (%)</th></tr></thead><tbody id="tv-body"></tbody></table></div>
+  </details>
+
+  <footer>출처: OECD Education at a Glance (<span class="mono">DF_LSO_EARN_REL_UPPER</span> 전일제 상대임금, <span class="mono">DF_LSO_NEAC_DISTR_EA</span> 학력 분포, <span class="mono">DF_LSO_NEAC_EMP</span> 고용률) · Gapminder (1인당 GDP PPP 2021년 불변 국제달러, 15–24세 실업률 ILOSTAT). 접근일 2026-10-24. OECD 평균 = OECD가 공표한 평균값(GDP·실업률은 회원국 단순평균). <a href="https://www.oecd.org/en/data.html" target="_blank" rel="noopener">oecd.org/en/data</a> · <a href="https://www.gapminder.org/data" target="_blank" rel="noopener">gapminder.org/data</a></footer>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/vega@6.4.0/build/vega.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-lite@6.4.3/build/vega-lite.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-embed@7.2.0/build/vega-embed.min.js"></script>
+<script>
+(function () {
+  const SPECS = /*__SPECS__*/null;
+  const D = /*__DATA__*/null;
+  const DEF = { sel: "KOR", cmp: "CAN", year: 2023, age: "25_34" };
+  const S = Object.assign({}, DEF);
+  const NAMES = D.names;
+  const ROW = {}; D.rows.forEach(r => { ROW[r.area + "|" + r.year] = r; });
+  const AVG = {}; D.avg.forEach(r => { AVG[r.year] = r; });
+  const views = {};
+  const $ = id => document.getElementById(id);
+
+  // ---------- 계산 도우미
+  const row = (a, y) => ROW[a + "|" + y] || null;
+  const val = (a, y, f) => { const r = row(a, y); return r && r[f] != null ? r[f] : null; };
+  const isNum = v => v !== null && v !== undefined && !Number.isNaN(v);
+  const f1 = v => isNum(v) ? (Math.round(Number(v) * 10 + 1e-9) / 10).toFixed(1) : null;
+  const r1 = v => isNum(v) ? Number(f1(v)) : null;   // 화면에 보이는 값
+  const diff = (a, b) => isNum(a) && isNum(b) ? Math.round((r1(a) - r1(b)) * 10) / 10 : null;
+  const sg = v => isNum(v) ? (v > 0 ? "+" : v < 0 ? "−" : "±") + Math.abs(v).toFixed(1) : null;
+  function josa(w, a, b) { const c = w.charCodeAt(w.length - 1) - 0xAC00; if (c < 0 || c > 11171) return w + a + '(' + b + ')'; return w + (c % 28 ? a : b); }
+  const ageTxt = a => a === "25_34" ? "25–34세" : "55–64세";
+  const PF = () => S.age === "25_34" ? "py" : "po";
+  const AF = () => S.age === "25_34" ? "ay" : "ao";
+  const DF = () => S.age === "25_34" ? "dpy" : "dpo";
+  const yearRows = (y, f) => D.rows.filter(r => r.year === y && isNum(r[f]));
+  function rank(y, f, a, desc) {
+    const list = yearRows(y, f).sort((p, q) => desc ? q[f] - p[f] : p[f] - q[f]);
+    const i = list.findIndex(r => r.area === a);
+    return i < 0 ? null : [i + 1, list.length];
+  }
+  function gapOf(r) { return r && isNum(r.py) && isNum(r.po) ? r.po - r.py : null; }
+  function ols(y) {
+    const xf = AF(), yf = PF();
+    const pts = D.rows.filter(r => r.year === y && isNum(r[xf]) && isNum(r[yf]));
+    const n = pts.length; if (n < 3) return null;
+    const mx = pts.reduce((s, r) => s + r[xf], 0) / n, my = pts.reduce((s, r) => s + r[yf], 0) / n;
+    let sxy = 0, sxx = 0, syy = 0;
+    pts.forEach(r => { sxy += (r[xf] - mx) * (r[yf] - my); sxx += (r[xf] - mx) ** 2; syy += (r[yf] - my) ** 2; });
+    const b = sxy / sxx; return { b, a: my - b * mx, r: sxy / Math.sqrt(sxx * syy), n };
+  }
+  function baseYear(a, f) { return isNum(val(a, 2014, f)) ? 2014 : isNum(val(a, 2015, f)) ? 2015 : null; }
+  function memberMean(y, f) { const l = yearRows(y, f); return l.length ? l.reduce((s, r) => s + r[f], 0) / l.length : null; }
+
+  // ---------- 화면 요소 만들기 (텍스트는 textContent로)
+  function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function rich(parent, parts) {   // parts: [text | {t, c}] — c = 's' | 'c' | 'b'
+    parent.textContent = "";
+    parts.forEach(p => {
+      if (typeof p === "string") parent.appendChild(document.createTextNode(p));
+      else { const s = el(p.c === "b" ? "b" : "span", p.c === "b" ? "" : p.c, p.t); parent.appendChild(s); }
+    });
+  }
+  function flash(node) { node.classList.remove("flash"); void node.offsetWidth; node.classList.add("flash"); }
+
+  // ---------- 렌더
+  function render() {
+    const y = S.year, sn = NAMES[S.sel], cn = S.cmp ? NAMES[S.cmp] : null, at = ageTxt(S.age);
+    const pf = PF(), af = AF(), df = DF();
+    const v = val(S.sel, y, pf), av = AVG[y] ? AVG[y][pf] : null;
+    const by0 = baseYear(S.sel, pf);
+    const dp = by0 ? diff(v, val(S.sel, by0, pf)) : null, adp = AVG[y] ? diff(AVG[y][pf], (AVG[2014] || {})[pf]) : null;
+
+    // 결론 문장
+    const H = $("headline");
+    if (!isNum(v)) rich(H, [{ t: sn, c: "s" }, `: ${y}년 ${at} 대졸 프리미엄 자료가 없습니다. 연도를 바꿔 보세요.`]);
+    else {
+      const d = Number(f1(v)) - Number(f1(av));   // 화면에 보이는 반올림 값끼리 빼서 문장 속 숫자가 맞아떨어지게
+      const parts = [{ t: sn, c: "s" }, `: ${y}년 ${at} 대졸 프리미엄 ${f1(v)} — OECD 평균(${f1(av)})보다 ${Math.abs(d).toFixed(1)} ${d < 0 ? "낮다" : "높다"}.`];
+      if (isNum(dp) && isNum(adp) && y > 2014) {
+        const rel = Math.round((dp - adp) * 10) / 10;
+        const sdp = Math.sign(Math.round(dp * 10)), sadp = Math.sign(Math.round(adp * 10));
+        const verdict = Math.abs(rel) < 0.5 ? "OECD 평균과 비슷하게 움직였다"
+          : (sdp < 0 && sadp > 0) ? "OECD 평균은 올랐는데 오히려 내려갔다"
+          : (sdp > 0 && sadp < 0) ? "OECD 평균은 내려갔는데 오히려 올랐다"
+          : rel < 0 ? (dp < 0 ? "OECD 평균보다 더 많이 내려갔다" : "OECD 평균보다 덜 올랐다") : (dp > 0 ? "OECD 평균보다 더 많이 올랐다" : "OECD 평균보다 덜 내려갔다");
+        parts.push(` 2014년 이후 ${sg(dp)} (OECD 평균 ${sg(adp)}): ${verdict}.`);
+      }
+      rich(H, parts);
+    }
+    flash(H);
+
+    // 1. KPI
+    $("h1").textContent = `${y}년, ${josa(sn, '은', '는')} 어디에 서 있나?`;
+    const K = $("kpis"); K.textContent = "";
+    const ar = AVG[y] || {};
+    const cards = [
+      { k: `대졸 임금 프리미엄 (${at}, 고졸 = 100)`, f: pf, avg: ar[pf], desc: true, unit: "", rk: "높은 순" },
+      { k: `대졸자 비율 (${at}, %)`, f: af, avg: ar[af], desc: true, unit: "%", rk: "높은 순" },
+      { k: "대졸 청년 고용률 (25–34세 기준, %)", f: "emp", avg: ar.emp, desc: true, unit: "%", rk: "높은 순" },
+      { k: "세대 격차 (55–64세 − 25–34세)", f: "gap", avg: (isNum(ar.po) && isNum(ar.py)) ? ar.po - ar.py : null, desc: true, unit: "", rk: "큰 순" },
+    ];
+    D.rows.forEach(r => { r.gap = gapOf(r); });
+    cards.forEach(c => {
+      const box = el("div", "kpi"); box.appendChild(el("div", "k", c.k));
+      const sv = val(S.sel, y, c.f);
+      const big = el("div", "v"); if (isNum(sv)) { big.textContent = f1(sv); if (c.unit) big.appendChild(el("small", "", c.unit)); } else { big.textContent = "자료 없음"; big.classList.add("na"); }
+      box.appendChild(big);
+      if (cn) { const cv = val(S.cmp, y, c.f); box.appendChild(el("div", "cmpv", `${cn}: ${isNum(cv) ? f1(cv) + c.unit : "자료 없음"}`)); }
+      box.appendChild(el("div", "avg", `OECD 평균: ${isNum(c.avg) ? f1(c.avg) + c.unit : "자료 없음"}`));
+      const rk = rank(y, c.f, S.sel, c.desc);
+      box.appendChild(el("div", "rk", rk ? `OECD 내 ${c.rk} #${rk[0]} / ${rk[1]}` : "순위: 자료 없음"));
+      if (isNum(sv) && isNum(c.avg)) { const d = Number(f1(sv)) - Number(f1(c.avg)); box.appendChild(el("span", "chip", `OECD 평균보다 ${Math.abs(d).toFixed(1)} ${d < 0 ? "낮음 ▼" : "높음 ▲"}`)); }
+      K.appendChild(box);
+    });
+    flash(K);
+
+    // 2. 변화표 + 선 설명
+    $("h2").textContent = `2014년 이후 ${sn}의 졸업장 값은 얼마나 변했나?`;
+    const T = $("chg"); T.textContent = "";
+    const hd = el("tr"); ["지표", "2014", String(y), "변화", "OECD 평균 변화", "OECD 평균 대비"].forEach(h => hd.appendChild(el("th", "", h)));
+    const thead = el("thead"); thead.appendChild(hd); T.appendChild(thead);
+    const tb = el("tbody"); T.appendChild(tb);
+    const ind = [
+      { n: `대졸 프리미엄 (${at})`, f: pf, oecd: true }, { n: `대졸자 비율 (${at}, %)`, f: af, oecd: true },
+      { n: "대졸 고용률 (25–34세, %)", f: "emp", oecd: true }, { n: "1인당 GDP (천$)", f: "gdp", oecd: false }, { n: "15–24세 실업률 (%)", f: "un", oecd: false },
+    ];
+    let usedAlt = false;
+    ind.forEach(it => {
+      const by = baseYear(S.sel, it.f); if (by === 2015) usedAlt = true;
+      const b = by ? val(S.sel, by, it.f) : null, e = val(S.sel, y, it.f);
+      const ch = y > (by || 9999) ? diff(e, b) : null;
+      const ab = it.oecd ? (AVG[2014] || {})[it.f] : memberMean(2014, it.f), ae = it.oecd ? (AVG[y] || {})[it.f] : memberMean(y, it.f);
+      const ach = y > 2014 ? diff(ae, ab) : null;
+      const tr = el("tr");
+      tr.appendChild(el("td", "", it.n));
+      tr.appendChild(el("td", "", isNum(b) ? f1(b) + (by === 2015 ? "*" : "") : "—"));
+      tr.appendChild(el("td", "", isNum(e) ? f1(e) : "—"));
+      tr.appendChild(el("td", isNum(ch) ? (ch > 0 ? "up" : ch < 0 ? "down" : "") : "", isNum(ch) ? sg(ch) : "—"));
+      tr.appendChild(el("td", "", isNum(ach) ? sg(ach) : "—"));
+      const rel = isNum(ch) && isNum(ach) ? Math.round((ch - ach) * 10) / 10 : null;
+      tr.appendChild(el("td", "vs", isNum(rel) ? (rel > 0 ? `▲ 평균 대비 +${rel.toFixed(1)}` : rel < 0 ? `▼ 평균 대비 −${Math.abs(rel).toFixed(1)}` : "평균과 같음") : "—"));
+      tb.appendChild(tr);
+    });
+    $("chg-note").textContent = (y <= 2014 ? "연도를 2015년 이후로 옮기면 변화가 계산됩니다. " : "") +
+      (usedAlt ? "* 2014년 값이 없어 2015년 값을 기준으로 했습니다. " : "") + "GDP·실업률의 OECD 평균은 회원국 단순평균입니다.";
+    flash(T);
+
+    const by = baseYear(S.sel, pf);
+    const tl = $("t-lines");
+    const lp = [el("b", "t", "이 차트가 보여주는 것")];
+    tl.textContent = ""; tl.appendChild(lp[0]);
+    const sp = el("span"); tl.appendChild(sp);
+    if (by && isNum(v) && y > by) {
+      const parts = [{ t: sn, c: "s" }, ` 프리미엄은 ${by}년 ${f1(val(S.sel, by, pf))} → ${y}년 ${f1(v)} (${sg(diff(v, val(S.sel, by, pf)))}). OECD 평균은 ${f1((AVG[2014] || {})[pf])} → ${f1(av)} (${sg(adp)}).`];
+      if (cn) { const cb = baseYear(S.cmp, pf), cv = val(S.cmp, y, pf); if (cb && isNum(cv) && y > cb) parts.push(" ", { t: cn, c: "c" }, `${josa(cn, '은', '는').slice(cn.length)} ${f1(val(S.cmp, cb, pf))} → ${f1(cv)} (${sg(diff(cv, val(S.cmp, cb, pf)))}).`); }
+      rich(sp, parts);
+    } else rich(sp, ["선택한 연도에 비교할 값이 없거나 2014년 이전입니다. 연도를 2015년 이후로 옮겨 보세요."]);
+
+    // 3. 산점도 설명
+    const fit = ols(y), ts = $("t-scatter"); ts.textContent = ""; ts.appendChild(el("b", "t", "이 차트가 보여주는 것")); const ss = el("span"); ts.appendChild(ss);
+    const xs = val(S.sel, y, af);
+    let resid = null;
+    if (fit && isNum(v) && isNum(xs)) {
+      const pred = fit.a + fit.b * xs; resid = v - pred;
+      const parts = [`${y}년 ${fit.n}개국: 대졸자 비율이 ${f1(xs)}%인 나라의 추세선 예상 프리미엄은 ${f1(pred)}. `, { t: sn, c: "s" },
+        `의 실제 값은 ${f1(v)}: 추세보다 ${Math.abs(resid).toFixed(1)} ${resid < 0 ? "낮다" : "높다"}.`];
+      const xc = cn ? val(S.cmp, y, af) : null, vc = cn ? val(S.cmp, y, pf) : null;
+      if (cn && isNum(xc) && isNum(vc)) { const rc = vc - (fit.a + fit.b * xc); parts.push(" ", { t: cn, c: "c" }, `${josa(cn, '은', '는').slice(cn.length)} 추세보다 ${Math.abs(rc).toFixed(1)} ${rc < 0 ? "낮다" : "높다"}.`); }
+      parts.push(` 전체 상관 r = ${fit.r.toFixed(2).replace('-', '−')}.`);
+      rich(ss, parts);
+    } else rich(ss, [`${y}년 ${at}에 ${sn}의 자료가 없어 추세와 비교할 수 없습니다.`]);
+
+    // 4. 덤벨 설명
+    const r0 = row(S.sel, y), g = gapOf(r0), td = $("t-db"); td.textContent = ""; td.appendChild(el("b", "t", "이 차트가 보여주는 것")); const sd = el("span"); td.appendChild(sd);
+    const ag = (isNum(ar.po) && isNum(ar.py)) ? ar.po - ar.py : null;
+    if (isNum(g)) {
+      const rk = rank(y, "gap", S.sel, true);
+      const parts = [{ t: sn, c: "s" }, `: 55–64세 ${f1(r0.po)} vs 25–34세 ${f1(r0.py)} → 세대 격차 ${f1(g)} (${rk ? `${rk[1]}개국 중 ${rk[0]}번째로 큼` : ""}). OECD 평균 격차는 ${f1(ag)}.`];
+      if (cn) { const gc = gapOf(row(S.cmp, y)); if (isNum(gc)) parts.push(" ", { t: cn, c: "c" }, `의 격차는 ${f1(gc)}.`); }
+      rich(sd, parts);
+    } else rich(sd, [`${y}년 ${sn}의 두 연령대 값이 모두 있지 않아 격차를 계산할 수 없습니다.`]);
+
+    // 5. 요점
+    const tk = $("take"); tk.textContent = "";
+    const p1 = el("p"), p2 = el("p"), p3 = el("p");
+    if (fit) {
+      const desc = fit.r <= -0.3 ? "대졸자가 많은 나라일수록 프리미엄이 낮은 경향이 있다" : fit.r >= 0.3 ? "대졸자가 많은 나라일수록 프리미엄이 높은 경향이 있다" : "대졸자 비율과 프리미엄 사이에 뚜렷한 관계가 없다";
+      rich(p1, [{ t: "한 해 단면: ", c: "b" }, `${y}년 ${at} ${fit.n}개국에서 ${desc} (r = ${fit.r.toFixed(2).replace('-', '−')}).`]);
+    } else rich(p1, [{ t: "한 해 단면: ", c: "b" }, "이 연도는 비교할 나라가 부족합니다."]);
+    if (isNum(resid)) rich(p2, [{ t: "선택 국가: ", c: "b" }, { t: sn, c: "s" }, `${josa(sn, '은', '는').slice(sn.length)} 대졸자 비율로 예측한 값보다 프리미엄이 ${Math.abs(resid).toFixed(1)} ${resid < 0 ? "낮다. 대졸자 수만으로는 설명되지 않는 부분이 있다" : "높다. 대졸자 수에 비해 졸업장 값이 유지되고 있다"}.`]);
+    else rich(p2, [{ t: "선택 국가: ", c: "b" }, `${sn}의 ${y}년 자료가 없습니다.`]);
+    rich(p3, [{ t: "변화로 보면: ", c: "b" }, `2014–15년 → 2022–23년, 25–34세 기준 ${D.change.n}개국에서 대졸자 비율 증가 폭과 프리미엄 변화의 상관은 r = ${Number(D.change.r).toFixed(2).replace('-', '−')}. 프리미엄이 내린 나라 ${D.change.down}개, 오른 나라 ${D.change.up}개로, 대졸자가 많이 늘어난 나라라고 졸업장 값이 더 떨어지지는 않았다.`]);
+    [p1, p2, p3].forEach(p => tk.appendChild(p));
+
+    // 표 보기
+    const tvb = $("tv-body"); tvb.textContent = "";
+    const list = D.rows.filter(r => r.year === y && isNum(r[pf])).sort((a, b) => b[pf] - a[pf]);
+    list.forEach(r => {
+      const tr = el("tr", r.area === S.sel ? "s" : r.area === S.cmp ? "c" : "");
+      [r.c, f1(r.py), f1(r.po), f1(r[af]), f1(r.emp), f1(r.gdp), f1(r.un)].forEach(x => tr.appendChild(el("td", "", x == null ? "—" : x)));
+      tvb.appendChild(tr);
+    });
+    $("tv-sum").textContent = `${y}년 모든 나라의 값을 표로 보기 (${list.length}개국, ${at} 프리미엄 높은 순)`;
+
+    // 차트 신호
+    const sig = { sel: S.sel, cmp: S.cmp || "__none__", selName: sn, cmpName: cn || "__none__", year: y, age: S.age };
+    Object.values(views).forEach(vw => {
+      Object.entries(sig).forEach(([k, x]) => { try { vw.signal(k, x); } catch (e) { /* 그 차트에 없는 신호 */ } });
+      vw.runAsync();
+    });
+  }
+
+  // ---------- 컨트롤
+  function fillSelects() {
+    const sel = $("sel"), cmp = $("cmp");
+    const entries = Object.entries(NAMES).sort((a, b) => a[1].localeCompare(b[1], "ko"));
+    sel.textContent = ""; cmp.textContent = "";
+    cmp.appendChild(new Option("비교 안 함", ""));
+    entries.forEach(([code, name]) => { sel.appendChild(new Option(name, code)); cmp.appendChild(new Option(name, code)); });
+  }
+  function syncControls() {
+    $("sel").value = S.sel; $("cmp").value = S.cmp; $("year").value = S.year; $("yearOut").textContent = S.year;
+    document.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.age === S.age)));
+  }
+  $("sel").addEventListener("change", e => { S.sel = e.target.value; if (S.cmp === S.sel) S.cmp = ""; syncControls(); render(); });
+  $("cmp").addEventListener("change", e => { S.cmp = e.target.value === S.sel ? "" : e.target.value; syncControls(); render(); });
+  $("year").addEventListener("input", e => { S.year = +e.target.value; $("yearOut").textContent = S.year; render(); });
+  document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => { S.age = b.dataset.age; syncControls(); render(); }));
+  $("reset").addEventListener("click", () => { Object.assign(S, DEF); syncControls(); render(); });
+
+  // ---------- 차트
+  const SWAP = [["#2a78d6", "#3987e5"], ["#eb6834", "#d95926"], ["#0b0b0b", "#f0efec"], ["#52514e", "#c3c2b7"], ["#c9c8c0", "#4a4945"],
+                ["#e3e2dc", "#2e2f2c"], ["#fcfcfb", "#171b20"], ["#ecebe6", "#262c31"], ["#c3c2b7", "#4a4945"], ["#a8a79f", "#5b5d58"],
+                ["#7d8f86", "#8fb3a3"], ["#5f7168", "#9cc2b1"], ["#898781", "#9a9890"]];
+  function isDark() {
+    const t = document.documentElement.getAttribute("data-theme");
+    if (t === "dark") return true; if (t === "light") return false;
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  }
+  function themed(spec, dark) {
+    let s = JSON.stringify(spec);
+    if (dark) { SWAP.forEach(([a], i) => { s = s.split(a).join("@@" + i + "@@"); }); SWAP.forEach(([, b], i) => { s = s.split("@@" + i + "@@").join(b); }); }
+    return JSON.parse(s);
+  }
+  function onClick(evt, item) {
+    const d = item && item.datum; if (!d || !d.area || d.area === "OECD") return;
+    if (evt.shiftKey) { if (d.area !== S.sel) S.cmp = d.area; } else { if (d.area === S.cmp) S.cmp = S.sel; S.sel = d.area; }
+    syncControls(); render();
+  }
+  async function embedAll() {
+    const dark = isDark();
+    for (const [key, id] of [["lines", "v-lines"], ["scatter", "v-scatter"], ["db", "v-db"]]) {
+      if (views[key]) { try { views[key].finalize(); } catch (e) {} }
+      try {
+        const res = await vegaEmbed("#" + id, themed(SPECS[key], dark), { actions: false, renderer: "svg", tooltip: { theme: dark ? "dark" : "light" } });
+        views[key] = res.view; res.view.addEventListener("click", onClick);
+      } catch (err) { $(id).textContent = "차트를 불러오지 못했습니다. 인터넷 연결을 확인한 뒤 새로고침해 주세요."; }
+    }
+    render();
+  }
+  fillSelects(); syncControls(); render(); embedAll();
+  if (window.matchMedia) window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", embedAll);
+  new MutationObserver(embedAll).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+})();
+</script>
