@@ -6,7 +6,7 @@ OECD 회원국의 **대졸 임금 프리미엄**(같은 나라·같은 연령대
 > 핵심 메시지: 대졸자가 더 많이 늘어난 나라에서 졸업장 값이 더 떨어지지는 않았다.
 > 한국 청년의 낮은 대졸 프리미엄은 '대졸자가 너무 많아서'만으로는 설명되지 않는다.
 
-## 먼저 열 것
+## 먼저 열어주셔야 할것!
 
 | 순서 | 무엇 | 어디 |
 |---|---|---|
@@ -14,9 +14,9 @@ OECD 회원국의 **대졸 임금 프리미엄**(같은 나라·같은 연령대
 | 2 | Part A 탐색 대시보드 | https://kunwuk12-gitgit.github.io/datavisualization_midterm/site/dashboard/ (또는 `site/dashboard/index.html`) |
 | 3 | Part B 설명 시각화 | https://kunwuk12-gitgit.github.io/datavisualization_midterm/site/story/ (또는 `site/story/index.html`) |
 
-- HTML 파일은 더블클릭하면 브라우저(Chrome·Safari·Edge)에서 열립니다. 별도 설치는 필요 없지만,
-  차트 라이브러리(Vega 6.4.0 / Vega-Lite 6.4.3 / Vega-Embed 7.2.0)를 CDN에서 불러오므로 **인터넷 연결이 필요**합니다.
-- 인터넷 없이 Part B를 확인하려면 `figures/story_c1.png ~ c3.png`를 보세요.
+- HTML 파일은 더블클릭하면 브라우저(Chrome·Safari·Edge)에서 열립니다.
+"시각화 해주는걸 인터넷 사용이 가능해야 하는걸로 만들어서 인터넷 연결이 필요합니다!"
+
 
 ## Part A 사용법
 
@@ -51,13 +51,13 @@ python build_dashboard.py
 python build_story.py
 ```
 
-## 데이터 출처 (접근일 2026-10-24)
+## 데이터 출처 (접근일 2026-10-23)
 
 - OECD Education at a Glance — `DF_LSO_EARN_REL_UPPER`(상대임금, 전일제), `DF_LSO_NEAC_DISTR_EA`(학력 분포),
   `DF_LSO_NEAC_EMP`(학력별 고용률). https://www.oecd.org/en/data.html
 - Gapminder — GDP per capita (PPP, 2021 int.$, v32), Aged 15–24 unemployment rate (ILOSTAT),
   country entities(지역·World Bank 소득그룹). https://www.gapminder.org/data
 
-## 가산점 신청
+## 가산점 관련 자료
 
 1. Part A 온라인 게시  2. Part B 온라인 게시  3. 여러 출처 데이터의 수집·결합·정제 (보고서 3장·7장)
